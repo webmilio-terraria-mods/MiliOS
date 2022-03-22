@@ -1,0 +1,9 @@
+Mods: {
+	MiliOS: {
+		Softwares: {
+			Donut: {
+				Tooltip: Donut!
+			}
+		}
+	}
+}

@@ -1,0 +1,4 @@
+displayName = MiliOS - UI Framework
+author = Webmilio
+version = 0.1
+modReferences = WebmilioCommons
