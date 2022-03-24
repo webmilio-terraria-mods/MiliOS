@@ -1,8 +1,15 @@
 Mods: {
 	MiliOS: {
-		Softwares: {
+		Applications: {
+			AppBrowser: {
+				Name: AppBrowser
+			}
 			Donut: {
-				Tooltip: Donut!
+				Name: Donut!
+			}
+			TaskManager: {
+				Name: Task Manager
+				Kill: Kill
 			}
 		}
 	}

@@ -15,4 +15,8 @@
       <HintPath>..\WebmilioCommons-Releases\WebmilioCommons.dll</HintPath>
     </Reference>
   </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Helpers\" />
+    <Folder Include="Players\" />
+  </ItemGroup>
 </Project>

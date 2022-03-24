@@ -1,1 +1,4 @@
-miliOS is a pretty cool mod, it does...this. Modify this file with a description of your mod.
+MiliOS is a pretty cool serial brand - I mean UI framework. It was originally designed to support my DnD mod, 
+but was later expanded to support pretty much anything that requires UIs.
+
+It's very easy to use and examples of this can be found on it's GitHub repo.

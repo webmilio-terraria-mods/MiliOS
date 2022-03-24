@@ -11,9 +11,11 @@ public class MiliOS : Mod
         Instance = this;
 
         Services = new();
-        Services.AddSingleton(_ => ModContent.GetInstance<MiliOSSystem>());
-
-        WebmilioCommonsMod.CommonServices.AddContainer(Services);
+        Services
+            .MapServices(typeof(MiliOS).Assembly)
+            .AddSingleton(_ => ModContent.GetInstance<MiliOSSystem>())
+            
+            .AddContainer(WebmilioCommonsMod.CommonServices);
     }
 
     public override void Unload()

@@ -1,109 +1,65 @@
 ﻿using System;
+using System.Collections.Generic;
 using Microsoft.Xna.Framework;
-using MiliOS.Interfaces;
+using MiliOS.Applications;
+using MiliOS.Helpers;
+using MiliOS.Taskbar;
 using Terraria;
-using Terraria.GameContent.UI.Elements;
 using Terraria.UI;
 
 namespace MiliOS.Taskbar;
 
-public class TaskbarPanel : UIPanel
+public class Taskbar : UIState
 {
+    public const int
+        IconSize = 64,
+        CHeight = IconSize + VerticalPadding * 2,
+        VerticalPadding = 5,
+        HorizontalPadding = 15;
+
     private const float
-        HiddenVAlign = 1.11f,
+        HiddenVAlign = 1.05f,
         ShownVAlign = .99f;
 
-    private const int 
-        _Padding = 5,
-        _Height = TaskBar.IconSize + _Padding * 2;
-
     private float _destination = HiddenVAlign;
+    private readonly TaskbarPanel _container;
 
-    private readonly ApplicationsGrid _applications;
-
-    public TaskbarPanel(IApplicationIconSubscriber subscriber)
+    public Taskbar()
     {
-        VAlign = 1;
-        HAlign = .5f;
+        Append(_container = new()
+        {
+            Width = new(0, 1),
+            Height = new(0, 1),
+            
+            VAlign = _destination,
 
-        Width = new(0, .92f);
-        Height = new(_Height, 0);
+            PaddingLeft = Taskbar.HorizontalPadding,
+            PaddingRight = Taskbar.HorizontalPadding,
 
-        SetPadding(_Padding);
-        PaddingLeft = 15;
-        PaddingRight = 15;
+            PaddingTop = Taskbar.VerticalPadding,
+            PaddingBottom = Taskbar.VerticalPadding,
 
-        Append(_applications = new(subscriber));
+            BackgroundColor = new(.1f, .1f, .1f, .75f)
+        });
+
+        VAlign = _destination;
     }
 
     public override void Update(GameTime gameTime)
     {
         if (ContainsPoint(Main.MouseScreen))
-        {
             Main.LocalPlayer.mouseInterface = true;
-        }
 
-        if (Math.Abs(VAlign - _destination) > 0.0001f)
+        if (MathF.Abs(VAlign - _destination) > 0.0001f)
         {
-            const float minSpeed = 0.00005f;
-            const float y = 0.05f - minSpeed;
-
-            float delta = y * (_destination - VAlign);
-
-            if (delta < 0)
-                delta -= minSpeed;
-            else
-                delta += minSpeed;
-
-            VAlign += delta;
+            VAlign += AnimationHelpers.SmoothTranslation(VAlign, _destination);
             Recalculate();
         }
 
         base.Update(gameTime);
     }
 
-    public void ToggleState()
-    {
-        _destination = _destination == ShownVAlign ?
-            HiddenVAlign : ShownVAlign;
-    }
-}
+    public void BuildTaskbar(IList<IApplicationDescriptor> descriptors) => _container.BuildTaskbar(descriptors);
 
-public class TaskBar : UIState, IApplicationIconSubscriber
-{
-    public const int IconSize = 64;
-
-    private TaskbarPanel _container;
-    private Tooltip _tooltipContainer;
-
-    public TaskBar()
-    {
-        Append(_container = new(this));
-    }
-
-    public void ToggleHidden()
-    {
-        _container.ToggleState();
-    }
-
-    public void HoveredApplicationChanged(TaskbarDescriptor icon)
-    {
-        if (icon == null)
-        {
-            if (_tooltipContainer != null)
-            {
-                RemoveChild(_tooltipContainer);
-                _tooltipContainer = null;
-            }
-
-            return;
-        }
-
-        _tooltipContainer = new(icon.GetTooltip())
-        {
-            XOffset = t => -t.GetDimensions().Width / 2,
-            YOffset = _ => -50
-        };
-        Append(_tooltipContainer);
-    }
+    public void Toggle() => _destination = _destination == ShownVAlign ? HiddenVAlign : ShownVAlign;
 }
