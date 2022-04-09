@@ -38,7 +38,7 @@ public class TaskManager : Application
     {
         public Descriptor() : base(
             LocalizedTextHelpers.GetModKey(nameof(MiliOS), $"Applications.{nameof(TaskManager)}.Name"),
-            MiliOS.Instance.Assets.Request<Texture2D>($"Applications/{nameof(TaskManager)}/icon"))
+            () => MiliOS.Instance.Assets.Request<Texture2D>($"Applications/{nameof(TaskManager)}/icon"))
         {
             AppIndex = int.MinValue + 1;
         }

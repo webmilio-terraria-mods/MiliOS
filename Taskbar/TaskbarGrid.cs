@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using MiliOS.Applications;
-using MiliOS.Applications.Donut;
 using Terraria.ModLoader.UI.Elements;
 using Terraria.UI;
 using WebmilioCommons.Extensions;

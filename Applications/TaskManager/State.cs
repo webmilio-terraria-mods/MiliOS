@@ -1,11 +1,10 @@
-﻿using Microsoft.Xna.Framework;
-using MiliOS.Explorer;
-using MiliOS.UI;
+﻿using MiliOS.Explorer;
+using MiliOS.Explorer.Wrapper;
 using Terraria.UI;
 
 namespace MiliOS.Applications.TaskManager;
 
-public class State : UIState, IExplorerWrapInPanel
+public class State : UIState, IExplorerWrapInPanel, IExplorerAutoPosition
 {
     public const int
         CWidth = 500,
@@ -26,4 +25,6 @@ public class State : UIState, IExplorerWrapInPanel
             Height = StyleDimension.Fill
         });
     }
+
+    public IWrapperSettings WrapperSettings { get; } = new WrapperSettings();
 }

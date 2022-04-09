@@ -7,7 +7,9 @@ namespace MiliOS.Explorer.Wrapper;
 
 public class WrapperPanel : UIPanel
 {
-    public WrapperPanel(Explorer explorer, IApplication application, IApplicationDescriptor descriptor, UIElement wraps)
+    private readonly WrapperTopBar _topBar;
+
+    public WrapperPanel(Explorer explorer, IApplication application, IApplicationDescriptor descriptor, IWrapperSettings settings, UIElement wraps)
     {
         Explorer = explorer;
 
@@ -19,11 +21,13 @@ public class WrapperPanel : UIPanel
         SetPadding(padding);
 
         // TOP BAR
-        Append(new WrapperTopBar(application, descriptor)
+        Append(_topBar = new(application, descriptor, settings)
         {
             Width = StyleDimension.Fill,
             Height = new(WrapperTopBar.CHeight, 0)
         });
+        _topBar.Close += TopBar_OnClose;
+        _topBar.Minimize += TopBar_OnMinimize;
 
         var dimensions = wraps.GetDimensions();
         float height = dimensions.Height + padding * 2;
@@ -40,7 +44,7 @@ public class WrapperPanel : UIPanel
 
         // APP
         {
-            AppContainer = new()
+            AppContainer = new(explorer)
             {
                 Width = StyleDimension.Fill,
                 Height = new(height - padding * 3, 0),
@@ -60,15 +64,26 @@ public class WrapperPanel : UIPanel
         }
     }
 
+    ~WrapperPanel()
+    {
+        _topBar.Close -= TopBar_OnClose;
+        _topBar.Minimize -= TopBar_OnMinimize;
+    }
+
     public override void MouseDown(UIMouseEvent evt)
     {
-        Explorer.Focus(this);
+        Explorer.TryFocus(this);
 
         base.MouseDown(evt);
     }
 
+    private void TopBar_OnClose(UIElement element) => Close?.Invoke(this);
+    private void TopBar_OnMinimize(UIElement element) => Minimize?.Invoke(this);
+
     public Explorer Explorer { get; }
     public UIElement Wrapped { get; }
 
-    public Terraria.GameContent.UI.Elements.UIPanel AppContainer { get; }
+    internal AppContainer AppContainer { get; }
+
+    public event UIElementAction Close, Minimize;
 }

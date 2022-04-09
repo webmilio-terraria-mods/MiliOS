@@ -16,47 +16,59 @@ public class WrapperTopBar : UIPanel
 
     private bool _previousMouse;
     private Vector2? _mouseOffset;
+    private CloseMinimizeGroup _buttonGroup;
 
-    public WrapperTopBar(IApplication application, IApplicationDescriptor descriptor)
+    public WrapperTopBar(IApplication application, IApplicationDescriptor descriptor, IWrapperSettings settings)
     {
         SetPadding(Padding);
 
-        var textDimensions = FontAssets.MouseText.Value.MeasureString(descriptor.Name.Value);
-
-        Append(new UIText(descriptor.Name)
+        if (descriptor != null)
         {
-            Left = new(CHeight + Padding * 2, 0),
-            Top = new(Padding, 0),
+            var textDimensions = FontAssets.MouseText.Value.MeasureString(descriptor.Name.Value);
 
-            Height = new(textDimensions.Y, 0),
+            Append(new UIText(descriptor.Name)
+            {
+                Left = new(CHeight + Padding * 2, 0),
+                Top = new(Padding, 0),
 
-            TextOriginX = 0,
+                Height = new(textDimensions.Y, 0),
 
-            VAlign = .5f,
-            Width = StyleDimension.Fill,
+                TextOriginX = 0,
 
-            OverflowHidden = true
-        });
+                VAlign = .5f,
+                Width = StyleDimension.Fill,
 
-        Append(new UIImage(descriptor.Icon)
-        {
-            Width = new(CHeight, 0),
-            Height = new(CHeight, 0),
+                OverflowHidden = true
+            });
 
-            VAlign = .5f,
+            Append(new UIImage(descriptor.Icon)
+            {
+                Width = new(CHeight, 0),
+                Height = new(CHeight, 0),
 
-            ScaleToFit = true
-        });
+                VAlign = .5f,
 
-        Append(new CloseMinimizeGroup(application)
+                ScaleToFit = true
+            });
+        }
+
+        Append(_buttonGroup = new(application, minimize: settings.ShowMinimize, close: settings.ShowClose)
         {
             HAlign = 1,
 
             Width = new(CHeight * 2, 0),
             Height = new(CHeight, 0)
         });
+        _buttonGroup.Close += ButtonGroup_OnClose;
+        _buttonGroup.Minimize += ButtonGroup_OnMinimize;
 
         BackgroundColor = BorderColor = Color.Transparent;
+    }
+
+    ~WrapperTopBar()
+    {
+        _buttonGroup.Close -= ButtonGroup_OnClose;
+        _buttonGroup.Minimize -= ButtonGroup_OnMinimize;
     }
 
     protected override void DrawSelf(SpriteBatch spriteBatch)
@@ -80,4 +92,9 @@ public class WrapperTopBar : UIPanel
         _previousMouse = Main.mouseLeft;
         base.DrawSelf(spriteBatch);
     }
+
+    private void ButtonGroup_OnClose(UIElement element) => Close?.Invoke(this);
+    private void ButtonGroup_OnMinimize(UIElement element) => Minimize?.Invoke(this);
+
+    public event UIElementAction Close, Minimize;
 }

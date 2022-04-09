@@ -1,5 +1,4 @@
-﻿using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
+﻿using Microsoft.Xna.Framework.Graphics;
 using MiliOS.Applications.AppBrowser.Interface;
 using Terraria;
 using WebmilioCommons.Helpers;
@@ -34,7 +33,8 @@ public class AppBrowser : Application
     {
         public Descriptor() : base(
             LocalizedTextHelpers.GetModKey(nameof(MiliOS), $"Applications.{nameof(AppBrowser)}.Name"),
-            MiliOS.Instance.Assets.Request<Texture2D>($"Applications/{nameof(AppBrowser)}/icon"))
+            () => MiliOS.Instance.Assets.Request<Texture2D>($"Applications/{nameof(AppBrowser)}/icon")
+            )
         {
             InAppBrowser = false;
 

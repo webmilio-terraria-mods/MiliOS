@@ -1,18 +1,17 @@
-﻿using Microsoft.Xna.Framework;
-using MiliOS.Applications;
+﻿using MiliOS.Applications;
 using MiliOS.Explorer.Wrapper;
 using Terraria.UI;
 
 namespace MiliOS.Explorer;
 
-public interface IExplorerWrapInPanel : IExplorerAutoPosition
+public interface IExplorerWrapInPanel
 {
-    public void WrapInPanel(Explorer container, IApplication application, IApplicationDescriptor descriptor, ref UIElement element)
+    public WrapperPanel WrapInPanel(Explorer container, IApplication application, IApplicationDescriptor descriptor, ref UIElement element)
     {
-        WrapperPanel wrapper = new(container, application, descriptor, element)
+        WrapperPanel wrapper = new(container, application, descriptor, WrapperSettings, element)
         {
-            BackgroundColor = WrapperBackgroundColor,
-            BorderColor = WrapperBorderColor
+            BackgroundColor = WrapperSettings.BackgroundColor,
+            BorderColor = WrapperSettings.BorderColor
         };
 
         container.RemoveElement(element);
@@ -20,8 +19,12 @@ public interface IExplorerWrapInPanel : IExplorerAutoPosition
 
         element = wrapper;
         container.Append(wrapper);
+
+        OnWrapped(wrapper);
+        return wrapper;
     }
 
-    public Color WrapperBackgroundColor => Color.Gray;
-    public Color WrapperBorderColor => Color.Black;
+    public void OnWrapped(WrapperPanel wrapper) { }
+
+    public IWrapperSettings WrapperSettings { get; }
 }

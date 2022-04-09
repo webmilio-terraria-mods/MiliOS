@@ -8,15 +8,15 @@ Mods: {
 				Name: Donut!
 			}
 			TaskManager: {
-				Name: Task Manager
-				Kill: Kill
+				Name: Gestionnaire de Tâches
+				Kill: Tuer
 			}
 		}
 		UI: {
 			OK: OK
-			Yes: Yes
-			No: No
-			Cancel: Cancel
+			Yes: Oui
+			No: Non
+			Cancel: Annuler
 		}
 	}
 }

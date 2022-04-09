@@ -15,24 +15,33 @@ public class CloseMinimizeGroup : UIPanel
 
     private UIImageButton _close, _minimize;
 
-    public CloseMinimizeGroup(IApplication application)
+    public CloseMinimizeGroup(IApplication application, bool minimize = true, bool close = true)
     {
         Application = application;
 
         SetPadding(0);
         BorderColor = BackgroundColor = Color.Transparent;
 
-        Append(_minimize = MakeButton(minimizeImage, 0));
-        Append(_close = MakeButton(closeImage, 1));
+        if (minimize)
+        {
+            Append(_minimize = MakeButton(minimizeImage, 0));
+            _minimize.OnClick += Close_OnClick;
+        }
 
-        _close.OnClick += Close_OnClick;
-        _minimize.OnClick += Minimize_OnClick;
+        if (close)
+        {
+            Append(_close = MakeButton(closeImage, 1));
+            _close.OnClick += Minimize_OnClick;
+        }
     }
 
     ~CloseMinimizeGroup()
     {
-        _close.OnClick -= Close_OnClick;
-        _minimize.OnClick -= Minimize_OnClick;
+        if (_minimize != null)
+            _minimize.OnClick -= Minimize_OnClick;
+
+        if (_close != null)
+            _close.OnClick -= Close_OnClick;
     }
 
     private UIImageButton MakeButton(Asset<Texture2D> texture, float hAlign)
@@ -48,13 +57,17 @@ public class CloseMinimizeGroup : UIPanel
 
     private void Close_OnClick(UIMouseEvent evt, UIElement element)
     {
+        Close?.Invoke(this);
         Application.Exit();
     }
 
     private void Minimize_OnClick(UIMouseEvent evt, UIElement element)
     {
+        Minimize?.Invoke(this);
         Application.Minimize();
     }
 
     public IApplication Application { get; }
+
+    public event UIElementAction Close, Minimize;
 }

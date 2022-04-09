@@ -1,10 +1,12 @@
 ﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 using MiliOS.Applications;
+using MiliOS.Explorer.Wrapper;
 using MiliOS.UI.Menues;
 using System;
 using System.Collections.Generic;
-using Microsoft.Xna.Framework.Graphics;
-using MiliOS.Explorer.Wrapper;
+using System.Linq;
+using MiliOS.Explorer.Dialogs;
 using Terraria;
 using Terraria.UI;
 using WebmilioCommons.DependencyInjection;
@@ -161,11 +163,37 @@ public class Explorer : UIState
 
             TerminateApplication(application);
         });
+        
+        Children.Do(c => c.Update(gameTime));
+    }
 
-        base.Update(gameTime);
+    public IApplication FindApplication(UIElement element)
+    {
+        return _states.FirstOrDefault(kv => kv.Value.Contains(element)).Key;
     }
 
     #region UI
+
+    public void SignalDialog(IApplication application, DialogBox dialog)
+    {
+        var wrapper = SignalApplicationInterface(application, dialog);
+
+        dialog.Close += Dialog_OnClose;
+
+        var dimensions = GetDimensions();
+        var wrapperDimensions = wrapper.GetDimensions();
+
+        wrapper.Left = new(dimensions.Width / 2 - wrapperDimensions.Width / 2, 0);
+        wrapper.Top = new(dimensions.Height / 2 - wrapperDimensions.Height / 2, 0);
+    }
+
+    private void Dialog_OnClose(DialogBox dialog)
+    {
+        var owner = FindApplication(dialog);
+        SignalTerminateInterface(owner, dialog);
+
+        dialog.Close -= Dialog_OnClose;
+    }
 
     public void AddContextMenu(ContextMenu menu) => AddContextMenu(menu, true);
     public void AddContextMenu(ContextMenu menu, bool unique)
@@ -229,8 +257,11 @@ public class Explorer : UIState
         _children.Remove(element);
     }
 
-    public void Focus(UIElement element)
+    public void TryFocus(UIElement element)
     {
+        if (Elements.Count == 1)
+            return;
+
         Elements.Move(element, Elements.Count - 1);
     }
 
